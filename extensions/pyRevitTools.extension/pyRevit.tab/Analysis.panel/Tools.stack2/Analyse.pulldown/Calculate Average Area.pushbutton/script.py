@@ -39,26 +39,36 @@ def calc_and_print(items, item_type, type_name, match_name):
     if match_name not in processed_items[item_type]:
         print("{} TYPE IS: {}".format(type_name, match_name))
         for item in items:
-            item_name = \
-                item.Parameter[DB.BuiltInParameter.ROOM_NAME].AsString()
-            item_number = \
-                item.Parameter[DB.BuiltInParameter.ROOM_NUMBER].AsString()
-            item_level = \
-                item.Parameter[
-                    DB.BuiltInParameter.ROOM_LEVEL_ID].AsValueString()
-            if match_name == item_name:
-                area_value = \
-                    item.Parameter[DB.BuiltInParameter.ROOM_AREA].AsDouble()
-                print('{} {} #{} \"{}\" @ \"{}\" = {}'.format(
-                    output.linkify(item.Id),
-                    type_name.title(),
-                    item_number,
-                    item_name,
-                    item_level,
-                    revit.units.format_area(area_value)
-                    ))
-                item_total_area += area_value
-                item_count += 1
+            if revit.query.is_placed(item):
+                item_name = \
+                    item.Parameter[DB.BuiltInParameter.ROOM_NAME].AsString()
+                item_number = \
+                    item.Parameter[DB.BuiltInParameter.ROOM_NUMBER].AsString()
+                item_level = \
+                    item.Parameter[
+                        DB.BuiltInParameter.ROOM_LEVEL_ID].AsValueString()
+                if match_name == item_name:
+                    area_value = \
+                        item.Parameter[DB.BuiltInParameter.ROOM_AREA].AsDouble()
+                    print('{} {} #{} \"{}\" @ \"{}\" = {}'.format(
+                        output.linkify(item.Id),
+                        type_name.title(),
+                        item_number,
+                        item_name,
+                        item_level,
+                        revit.units.format_area(area_value)
+                        ))
+                    item_total_area += area_value
+                    item_count += 1
+            else:
+                print(':cross_mark: '
+                      'SKIPPED \"NOT PLACED\" {} {} #{} \"{}\" @ \"{}\"'
+                      .format(
+                          output.linkify(item.Id),
+                          type_name.title(),
+                          item_number,
+                          item_name,
+                          item_level))
         print("TOTAL OF {} {}S WERE FOUND.".format(item_count, type_name))
         processed_items[item_type].append(match_name)
     return item_total_area, item_count
@@ -91,5 +101,7 @@ for el in selection.elements:
         print('\nAVERAGE AREA OF THE SELECTED TYPE IS:'
               '\n{}'
               '\n ======================================='
-              '\n{} ACRE'.format(revit.units.format_area(average),
-                                 average / 43560))
+              '\n{} ACRE'
+              '\n{} HECTARES'.format(revit.units.format_area(average),
+                                     average / 43560,
+                                     average / 107639))
