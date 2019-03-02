@@ -159,7 +159,7 @@ You can get the default logger for the script using :func:`pyrevit.script.get_lo
 
 .. code-block:: python
 
-    from pyrevt import script
+    from pyrevit import script
 
     logger = script.get_logger()
 
